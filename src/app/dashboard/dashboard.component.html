@@ -1,0 +1,98 @@
+<div class="section">
+    <div class="columns">
+        <div class="column">
+            <div class="dropdown" [class.is-active]="facilityDrpdIsOpen">
+                <div class="dropdown-trigger" (click)="toggleFacilityDrpd()">
+                    <button class="button" aria-haspopup="true"
+                        aria-controls="dropdown-menu">
+                        <span *ngIf="!selectedFacility">Gebäude</span>
+                        <span *ngIf="selectedFacility">{{selectedFacility.address}}</span>
+                        <span class="icon is-small">
+                            <i class="fas fa-angle-down" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                </div>
+                <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                    <div class="dropdown-content">
+                        <a *ngFor="let item of facilites" class="dropdown-item"
+                            (click)="selectFacility(item)">
+                            {{ item.address }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div *ngIf="selectedFacility" class="item-container">
+                    <div *ngFor="let floor of selectedFacility.floors">
+                        <p class="has-text-weight-bold">{{ floor.floorName }}</p>
+                        <div *ngFor="let flat of floor.flats">
+                            <div [class.has-background-primary]="selectedFlat?.flatId === flat.flatId" 
+                            [class.has-background-danger-light]="(selectedFlat?.flatId !== flat.flatId) && !isFree(flat.flatId)"
+                            [class.has-background-success-light]="(selectedFlat?.flatId !== flat.flatId) && isFree(flat.flatId)"
+                            class="box item has-click has-text-centered" 
+                            (click)="selectFlat(flat)">
+                                <div class="is-size-7 has-text-grey-lighter">
+                                    {{
+                                    flat.flatId }}</div>
+                                <div>{{ flat.flatName }}</div>
+
+                                <button *ngIf="flat.moveHistory" (click)="openMoveHistory(flat.flatId)" class="button">
+                                    <span *ngIf="showMoveHistory !== flat.flatId">Zeige Miethistorie</span>
+                                    <span *ngIf="showMoveHistory === flat.flatId">Schließe Miethistorie</span>
+                                </button>
+                                <div *ngIf="showMoveHistory === flat.flatId">
+                                    <hr>
+                                    <div class="has-text-weight-bold">Mieterhistorie</div>
+                                    <div *ngFor="let h of flat.moveHistory">
+                                        <div><span class="has-text-weight-bold"> Mieter: </span>{{ getTenantById(h.tenantId).name }}</div>
+                                        <div><span class="has-text-weight-bold">Einzugsdatum: </span>{{ h.moveDate }}</div>
+                                        <hr>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="column">
+            <div *ngFor="let tenant of tenants">
+                <div 
+                [class.has-background-primary]="selectedTenant && selectedTenant._id === tenant._id" 
+                class="box item has-click has-text-centered"
+                (click)="selectTenant(tenant)">
+                    <div class="is-size-7 has-text-grey-lighter">
+                        {{ tenant._id }}</div>
+                    <div>{{ tenant.name }}</div>
+
+                    <div *ngIf="tenant.flatId">
+                        <div class="is-size-7">{{ getFlatById(tenant.flatId).flatName }}</div>
+                        <div class="is-size-7">{{ getFloorById(getFlatById(tenant.flatId).floorId).floorName }}</div>
+                        <div class="is-size-7">{{ getFacilityById(getFloorById(getFlatById(tenant.flatId).floorId).facilityId).address }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div [formGroup]="tenantMoveForm" class="column">
+                <input formControlName="tenantId" class="input" type="text" placeholder="Mieter Id">
+                <input formControlName="flatId" class="input" type="text" placeholder="Wohnungs Id">
+                <input id="datepicker" formControlName="moveDate" class="input" type="date" placeholder="Umzugsdatum">
+
+            
+                <button [class.is-loading]="tenantBtnLoading" (click)="moveTenant()" class="button is-fullwidth is-primary">
+                    Mieter umziehen lassen
+                </button>
+            </div>
+
+            <div [formGroup]="tenantForm" class="column">
+                <input formControlName="name" class="input" type="text" placeholder="Name">
+            
+                <button [class.is-loading]="tenantBtnLoading" (click)="createTenant()" class="button is-fullwidth is-primary">
+                    Mieter erstellen
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

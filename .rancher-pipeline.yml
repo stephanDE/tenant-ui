@@ -1,0 +1,18 @@
+stages:
+  - name: Publish
+    steps:
+      - publishImageConfig:
+          dockerfilePath: ./Dockerfile
+          buildContext: .
+          tag: awcloud/tenantui:${CICD_EXECUTION_SEQUENCE}
+  - name: Deploy
+    steps:
+      - applyYamlConfig:
+          path: ./deploy/deployment-dev.yaml
+      - applyYamlConfig:
+          path: ./deploy/deployment-stag.yaml
+        when:
+          branch: master
+          event: push
+timeout: 1060
+notification: {}

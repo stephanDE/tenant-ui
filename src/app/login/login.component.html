@@ -1,0 +1,46 @@
+<section class="hero is-primary is-fullheight">
+    <div class="hero-body">
+        <div class="container">
+            <div class="columns is-centered">
+                <div class="column is-5-desktop">
+                    <div [formGroup]="profileForm" class="box">
+                        <div class="field">
+                            <label for="" class="label">Email</label>
+                            <div class="control">
+                                <input formControlName="username" type="email"
+                                    class="input">
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label for="" class="label">Password</label>
+                            <div class="control">
+                                <input formControlName="password"
+                                    type="password" class="input">
+                            </div>
+                        </div>
+                        <div *ngIf="error" class="field">
+                            <article class="message is-danger">
+                                <div class="message-header">
+                                    <p>Fehler beim Anmelden</p>
+                                    <button class="delete"
+                                        (click)="removeError()"
+                                        aria-label="delete"></button>
+                                </div>
+                                <div class="message-body">
+                                    Bitte überprüfe deine Logindaten.
+                                </div>
+                            </article>
+                        </div>
+                        <div class="field">
+                            <button [class.is-loading]="isLoading"
+                                (click)="login()" class="button is-fullwidth
+                                is-primary">
+                                Login
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
