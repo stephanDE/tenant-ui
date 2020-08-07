@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
   tenantMoveForm = new FormGroup({
     tenantId: new FormControl(''),
     flatId: new FormControl(''),
-    moveDate: new FormControl(''),
+    moveDate: new FormControl(new Date()),
   });
 
   public facilites;
@@ -144,6 +144,8 @@ export class DashboardComponent implements OnInit {
     this.dashboardService.createTenant(this.tenantForm.value).subscribe(r => {
       this.tenantBtnLoading = false;
       this.loadTenants();
+    }, (r) => {
+      this.tenantBtnLoading = false;
     });
   }
 
@@ -166,6 +168,8 @@ export class DashboardComponent implements OnInit {
       this.tenantBtnLoading = false;
       this.loadTenants();
       this.loadFacilites();
+    }, r => {
+      this.tenantBtnLoading = false;
     });
   }
 }

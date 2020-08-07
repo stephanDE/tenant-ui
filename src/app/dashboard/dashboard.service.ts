@@ -3,6 +3,8 @@ import * as jwt_decode from 'jwt-decode';
 import { Router } from '@angular/router';
 import { EnvService } from '../env.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ToastrService, IndividualConfig } from 'ngx-toastr';
+
 
 
 @Injectable({ providedIn: 'root' })
