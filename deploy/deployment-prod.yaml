@@ -1,59 +1,59 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: tenant-ui-service
+  name: device-ui-service
   namespace: prod
 spec:
   selector:
-    app: tenant-ui-service
+    app: device-ui-service
   ports:
     - port: 80
       targetPort: 80
-      name: tenant-ui-service
+      name: device-ui-service
       protocol: TCP
   type: ClusterIP
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: tenant-ui-service
+  name: device-ui-service
   namespace: prod
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tenant-ui-service
+      app: device-ui-service
   template:
     metadata:
       labels:
-        app: tenant-ui-service
+        app: device-ui-service
     spec:
       imagePullSecrets:
         - name: pipeline-docker-registry
       containers:
-        - name: tenant-ui-service
+        - name: device-ui-service
           image: ${CICD_IMAGE}:${CICD_EXECUTION_SEQUENCE}
           env:
             - name: ENV
               value: ""
           envFrom:
             - secretRef:
-                name: tenant-ui-prod
+                name: device-ui-prod
                 optional: false
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: tenant-ui
+  name: device-ui
   namespace: prod
 spec:
   rules:
-    - host: tenant-ui.116.203.237.159.xip.io
+    - host: device-ui.116.203.237.159.xip.io
       http:
         paths:
           - backend:
-              serviceName: tenant-ui-service
+              serviceName: device-ui-service
               servicePort: 80
   tls:
     - hosts:
-        - tenant-ui.116.203.237.159.xip.io
+        - device-ui.116.203.237.159.xip.io

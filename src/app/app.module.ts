@@ -22,7 +22,7 @@ import { ToastrHttpInterceptor } from './http.interceptor';
     AppRoutingModule,
     SharedModule,
     BrowserAnimationsModule,
-    ToastrModule.forRoot(),
+    ToastrModule.forRoot()
   ],
   exports: [
   ],

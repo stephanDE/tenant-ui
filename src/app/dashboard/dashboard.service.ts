@@ -25,20 +25,14 @@ export class DashboardService {
     });
   }
 
-  getTenants() {
-    return this.httpClient.get(`${this.envService.apiUrl}/tenant`, {
+  getDevice(roomId) {
+    return this.httpClient.get(`${this.envService.apiUrl}/device/${roomId}`, {
       headers: this.headers
     });
   }
 
-  createTenant(value) {
-    return this.httpClient.post(`${this.envService.apiUrl}/tenant`, value, {
-      headers: this.headers
-    });
-  }
-
-  moveTenant(value) {
-    return this.httpClient.patch(`${this.envService.apiUrl}/tenant`, value, {
+  getFraunhoferDevice(id) {
+    return this.httpClient.get(`${this.envService.apiUrl}/fraunhofer-device/${id}`, {
       headers: this.headers
     });
   }

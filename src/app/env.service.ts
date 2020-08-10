@@ -34,16 +34,16 @@ export class EnvService {
 
     if (/^.*localhost.*/.test(hostname)) {
       this._env = Environment.Local;
-      this._apiUrl = 'https://tenant-api.dev.78.47.57.179.xip.io/api';
-    } else if (/^tenant-ui.dev/.test(hostname)) {
+      this._apiUrl = 'https://device-api.dev.78.47.57.179.xip.io/api';
+    } else if (/^device-ui.dev/.test(hostname)) {
       this._env = Environment.Dev;
-      this._apiUrl = 'https://tenant-api.dev.78.47.57.179.xip.io/api';
-    } else if (/^tenant-ui.testing/.test(hostname)) {
+      this._apiUrl = 'https://device-api.dev.78.47.57.179.xip.io/api';
+    } else if (/^device-ui.testing/.test(hostname)) {
       this._env = Environment.Staging;
-      this._apiUrl = 'https://tenant-api.test.78.47.57.179.xip.io/api';
-    } else if (/^tenant-ui/.test(hostname)) {
+      this._apiUrl = 'https://device-api.test.78.47.57.179.xip.io/api';
+    } else if (/^device-ui/.test(hostname)) {
       this._env = Environment.Prod;
-      this._apiUrl = 'https://tenant-api.78.47.57.179.xip.io/api';
+      this._apiUrl = 'https://device-api.78.47.57.179.xip.io/api';
     } else {
       console.warn(`Cannot find environment for host name ${hostname}`);
     }
