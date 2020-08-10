@@ -1,16 +1,28 @@
 import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormControl } from '@angular/forms';
 import { DashboardService } from './dashboard.service';
+import * as bulmaCalendar from 'bulma-calendar';
+import { DatePipe } from '@angular/common';
 
-import { find, flatMap, filter} from 'lodash';
+import { find, flatMap, some} from 'lodash';
 
-import * as moment from 'moment';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
+
+  tenantForm = new FormGroup({
+    name: new FormControl(''),
+  });
+
+  tenantMoveForm = new FormGroup({
+    tenantId: new FormControl(''),
+    flatId: new FormControl(''),
+    moveDate: new FormControl(new Date()),
+  });
 
   public facilites;
   public facilityDrpdIsOpen: boolean;
@@ -32,20 +44,32 @@ export class DashboardComponent {
 
   public showMoveHistory;
 
-  public dataLoading;
+  ngAfterViewInit() {
 
-  public openedId: string;
-  public fraunhoferData;
+    setTimeout(() => {
+      this.calendar = bulmaCalendar.attach(`#datepicker`, {
+        startDate: new Date()
+      })[0];
+
+      this.calendar.on('select', (datepicker) => {
+      const value = this.datePipe.transform(+datepicker.data.startDate);
+      
+        this.tenantMoveForm.patchValue({moveDate: value});
+      
+      });
+    });
+  }
 
   
   constructor(
-    private dashboardService: DashboardService
-  ) { 
-    moment.locale('de');
-  }
+    private dashboardService: DashboardService,
+    private datePipe: DatePipe
+
+  ) { }
 
   ngOnInit(): void {
     this.loadFacilites();
+    this.loadTenants();
   }
 
   getFlatById(flatId) {
@@ -70,9 +94,16 @@ export class DashboardComponent {
     return find(a, {floorId});
   }
 
-  get rooms() {
-    if(!this.selectedFlat) return [];
-    return this.selectedFlat.rooms;
+  getTenantById(tenantId) {
+    return find(this.tenants, {_id: tenantId});
+  }
+
+  openMoveHistory(flatId) {
+    if(this.showMoveHistory === flatId) {
+      this.showMoveHistory = false;
+    } else {
+      this.showMoveHistory = flatId;
+    }
   }
 
   getFacilityById(facilityId) {
@@ -89,6 +120,17 @@ export class DashboardComponent {
     this.selectedFacility = facility;  
   }
 
+  selectTenant(tenant) {
+    this.tenantMoveForm.patchValue({
+      tenantId: tenant._id
+    });
+    this.selectedTenant = tenant;
+  }
+
+  isFree(flatId) {
+    return !some(this.tenants, t => t.flatId === flatId);
+  }
+
 
   loadFacilites() {
     return this.dashboardService.getFacilities().subscribe(r => {
@@ -97,36 +139,37 @@ export class DashboardComponent {
     });
   }
 
-
-  selectFlat(item) {
-    this.selectedFlat = item;
-
-    /*
-    this.dashboardService.getDevices().subscribe(r => {
-      debugger;
-
-      //const filtered = filter(r, {roomId: this.selectedFlat})
-
-      this.dashboardService.getFraunhoferDevice(r[0]._id).subscribe(r => {
-        debugger;
-      });
-    });*/
-    
-  }
-
-  openData(room) {
-    this.dataLoading = true;
-    this.openedId = room.roomId;
-
-    this.dashboardService.getDevice(room.roomId).subscribe(r => {
-      this.dashboardService.getFraunhoferDevice((r as any)._id).subscribe(r => {
-        this.dataLoading = false;
-        this.fraunhoferData = r;
-      });
+  createTenant() {
+    this.tenantBtnLoading = true;
+    this.dashboardService.createTenant(this.tenantForm.value).subscribe(r => {
+      this.tenantBtnLoading = false;
+      this.loadTenants();
+    }, (r) => {
+      this.tenantBtnLoading = false;
     });
   }
 
-  getTime(value) {
-    return moment(value).fromNow();
+  selectFlat(item) {
+    this.tenantMoveForm.patchValue({
+      flatId: item.flatId
+    });
+    this.selectedFlat = item;
+  }
+
+  loadTenants() {
+    return this.dashboardService.getTenants().subscribe(r => {
+      this.tenants = r;
+    });
+  }
+
+  moveTenant() {
+    this.tenantBtnLoading = true;
+    this.dashboardService.moveTenant(this.tenantMoveForm.value).subscribe(r => {
+      this.tenantBtnLoading = false;
+      this.loadTenants();
+      this.loadFacilites();
+    }, r => {
+      this.tenantBtnLoading = false;
+    });
   }
 }
