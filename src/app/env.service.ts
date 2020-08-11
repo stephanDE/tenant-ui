@@ -40,10 +40,10 @@ export class EnvService {
       this._apiUrl = 'https://tenant-api.dev.78.47.57.179.xip.io/api';
     } else if (/^tenant-ui.testing/.test(hostname)) {
       this._env = Environment.Staging;
-      this._apiUrl = 'https://tenant-api.testing.78.47.57.179.xip.io/api';
+      this._apiUrl = 'https://tenant-api.testing.116.203.237.159.xip.io/api';
     } else if (/^tenant-ui/.test(hostname)) {
       this._env = Environment.Prod;
-      this._apiUrl = 'https://tenant-api.78.47.57.179.xip.io/api';
+      this._apiUrl = 'https://tenant-api.116.203.237.159.xip.io/api';
     } else {
       console.warn(`Cannot find environment for host name ${hostname}`);
     }
