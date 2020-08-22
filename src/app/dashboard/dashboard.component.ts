@@ -4,7 +4,7 @@ import { DashboardService } from './dashboard.service';
 import * as bulmaCalendar from 'bulma-calendar';
 import { DatePipe } from '@angular/common';
 
-import { find, flatMap, some} from 'lodash';
+import { find, flatMap, some, sumBy, findIndex, last, first } from 'lodash';
 
 
 @Component({
@@ -43,6 +43,7 @@ export class DashboardComponent implements OnInit {
   public calendar;
 
   public showMoveHistory;
+  public devices;
 
   ngAfterViewInit() {
 
@@ -70,6 +71,7 @@ export class DashboardComponent implements OnInit {
   ngOnInit(): void {
     this.loadFacilites();
     this.loadTenants();
+    this.dashboardService.getDevices().subscribe(d => this.devices = d);
   }
 
   getFlatById(flatId) {
@@ -147,6 +149,55 @@ export class DashboardComponent implements OnInit {
     }, (r) => {
       this.tenantBtnLoading = false;
     });
+  }
+
+  getDeviceCalc(tenant) {
+    if(!this.selectedFlat) 
+      return 0;
+
+    const { moveHistory } = this.selectedFlat;
+
+    const tenantIndex = findIndex(moveHistory, {tenantId: tenant.tenantId});
+
+    if(!moveHistory[tenantIndex])
+      return 0;
+    
+    const moveIn = moveHistory[tenantIndex].moveDate;
+    const moveOut = tenantIndex < moveHistory.length - 1 && moveHistory[tenantIndex + 1].moveDate;
+
+    const moveInDate = new Date(moveIn);
+
+    const moveOutDate = moveOut ? new Date(moveOut) : new Date();
+
+    if(moveOut) {
+      moveOutDate.setDate(moveOutDate.getDate() - 1);
+    }
+
+
+    const filtered = this.devices.filter(d => d.roomId);
+    
+    const rooms = filtered.filter(d => {
+      return find(this.selectedFlat.rooms, {roomId: d.roomId})
+    });
+
+    const b = sumBy(rooms, room => {
+      let moveInDevice = last(room.meterValue.filter(meterValue => {
+        const meterDate = new Date(meterValue.timestamp);
+        return meterDate >= moveInDate;
+      }));
+
+      let moveOutDevice = first(room.meterValue.filter(meterValue => {
+        const meterDate = new Date(meterValue.timestamp);
+        return meterDate <= moveOutDate;
+      }));
+
+      const moveInValue = moveInDevice.value;
+      const moveOutValue = moveOutDevice.value;
+
+      return moveOutValue - moveInValue;
+    });
+
+    return b;
   }
 
   selectFlat(item) {

@@ -25,6 +25,12 @@ export class DashboardService {
     });
   }
 
+  getDevices() {
+    return this.httpClient.get(`${this.envService.apiUrl}/device`, {
+      headers: this.headers
+    });
+  }
+
   getTenants() {
     return this.httpClient.get(`${this.envService.apiUrl}/tenant`, {
       headers: this.headers
