@@ -104,6 +104,7 @@ export class DashboardComponent implements OnInit {
     if(this.showMoveHistory === flatId) {
       this.showMoveHistory = false;
     } else {
+      this.selectFlat(this.getFlatById(flatId));
       this.showMoveHistory = flatId;
     }
   }
@@ -171,6 +172,8 @@ export class DashboardComponent implements OnInit {
 
     if(moveOut) {
       moveOutDate.setDate(moveOutDate.getDate() - 1);
+      moveOutDate.setHours(23);
+      moveOutDate.setMinutes(59);
     }
 
 
@@ -191,10 +194,14 @@ export class DashboardComponent implements OnInit {
         return meterDate <= moveOutDate;
       }));
 
+      if(!moveOutDevice) {
+        moveOutDevice = last(room.meterValue);
+      }
+
       const moveInValue = moveInDevice.value;
       const moveOutValue = moveOutDevice.value;
 
-      return moveOutValue - moveInValue;
+      return Math.abs(moveOutValue - moveInValue);
     });
 
     return b;
